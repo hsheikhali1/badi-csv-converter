@@ -1,12 +1,12 @@
-## Author: Harun Sheikhali
-## Date: Wed June 30th
-## Description: Simple python script to conver CSV to JSON
-import csv
+# Author: Harun Sheikhali
+# Date: Wed June 30th
+# Description: Simple python script to conver CSV to JSON
+from zendesk_api.api import ZendeskApiHandler
+import pandas as pd
 import json
 
 
-
-def make_json(csv_file_path, json_file_path = './'):
+def make_json(csv_file_path, json_file_path='./'):
     '''
     function that will convert a CSV to JSON
     takes the file paths as args
@@ -15,21 +15,31 @@ def make_json(csv_file_path, json_file_path = './'):
     default is the root directory
     '''
 
-    data = {}
-
-    with open(csv_file_path, encoding='utf-8') as csv_f:
-        csv_reader = csv.DictReader(csv_f)
-
-        for rows in csv_reader:
-            key = rows['No']
-            data[key] = rows
+    # use pandas to create csv
+    data_file = pd.read_csv(csv_file_path)
+    # use pandas to convert it to a json file
+    data_file.to_json('./badi-example.json')
 
 
-    with open(json_file_path, 'w', encoding='utf-8') as json_f:
-        json_f.write(json.dumps(data, indent=4))
+def post_to_zendesk():
+    # read json file
+    json_file = open('./badi-example.json')
+    data = json.load(json_file)
+
+    for i in data:
+        print(data[i])
+
+    json_file.close()
+
+    # Initialize the API handler
+    zendesk_api_hander = ZendeskApiHandler('', credentials={})
+
+    # create ticket in zendesk
+    # zendesk_api_hander.create_ticket(
+    #     assignee='', priority='', subject='', body='')
 
 
 if __name__ == "__main__":
-    make_json(csv_file_path='./example_csv.csv')
-
-
+    # make json
+    # make_json(csv_file_path=r'./badi-example.csv')
+    post_to_zendesk()
