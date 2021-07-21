@@ -1,4 +1,4 @@
-from tracemalloc import DomainFilter
+from requests.exceptions import HTTPError, ConnectionError
 import requests
 
 
@@ -10,17 +10,23 @@ class ZendeskApiHandler:
             "password": ''
         }
 
+    def google_example(self):
+        result = requests.get('https://google.ca')
+
+        print(result.text)
+
     def create_ticket(self, assignee, priority, subject, body):
         payload = {
-            "assignee": assignee,
-            "priority": priority,
-            "subject": subject,
-            "body": body
+            assignee: {
+                "id": "12345k",
+            }
         }
 
         try:
             requests.post(f"{self.domain}/", data=payload,
                           auth=(self.credentials['username'], self.credentials['password']))
 
-        except requests.exceptions.HTTPError as http_err:
+        except HTTPError as http_err:
             print(str(http_err))
+        except ConnectionError as con_err:
+            print(str(con_err))
